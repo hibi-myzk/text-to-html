@@ -1,1 +1,75 @@
-<h1>Hello!</h1>
+<html>
+    <head>
+        <title>text-to-html</title>
+        <style>
+            textarea {
+                width: 400px;
+                height: 200px;
+            }
+            
+            button {
+                width: 400px;
+                margin: 10px 0;
+            }
+            
+            .area {
+                margin: 20px 0;
+            }
+            
+            #copied {
+                color: #f00;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>text-to-html</h1>
+        <div class="area">
+            <label>text</label><br/>
+            <textarea id="text"></textarea>
+        </div>
+        <div class="area">
+            <label>html</label><br/>
+            <textarea id="html"></textarea>
+            <br/>
+            <button onclick="copy()">Copy</button>
+            <br/>
+            <span id="copied" style="display: none;">Copied!</span>
+        </div>
+        <script>
+            function copy() {
+                var textarea = document.getElementById('html');
+
+                textarea.select();
+
+                var range = document.createRange();
+                range.selectNodeContents(textarea);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                textarea.setSelectionRange(0, 999999);
+
+                document.execCommand("copy");
+
+                document.getElementById('copied').style.display = 'inline';
+            }
+
+            function textToHtml(text) {
+                var rexp = /((http|https):\/\/[\w?=&.\/-;#~%-]+(?![\w\s?&.\/;#~%"=-]*>))/g;
+                var html = text.replace(rexp, "<a href=\"$1\" target=\"_blank\">$1</a>");
+                html = html.replace(/(\n\r|\n|\r)/g, "<br>\n");
+                html = "<p>\n" + html + "\n</p>"
+                
+                return html;
+            }
+            
+            document.getElementById('text').addEventListener('input', function(e) {
+                document.getElementById('copied').style.display = 'none';
+                
+                var text = this.value;
+                var html = textToHtml(text);
+                
+                document.getElementById('html').value = html;
+            });
+        </script>
+    </body>
+</html>
